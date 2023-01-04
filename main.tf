@@ -115,9 +115,6 @@ resource "aws_api_gateway_method" "post_message" {
   api_key_required     = false
   http_method          = "POST"
   authorization        = "NONE"
-  lifecycle {
-    replace_triggered_by = [aws_api_gateway_stage.main.id]
-  }
 }
 
 resource "aws_api_gateway_method" "get_messages" {
@@ -126,9 +123,6 @@ resource "aws_api_gateway_method" "get_messages" {
   api_key_required     = false
   http_method          = "GET"
   authorization        = "NONE"
-  lifecycle {
-    replace_triggered_by = [aws_api_gateway_stage.main.id]
-  }
 }
 
 #query messages
@@ -201,8 +195,10 @@ resource "aws_api_gateway_deployment" "api" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   triggers = {
     redeployment = sha1(jsonencode([
-      aws_api_gateway_method.post_message.id,
-      aws_api_gateway_integration.post_message.id
+      aws_api_gateway_method.post_message,
+      aws_api_gateway_integration.post_message,
+      aws_api_gateway_method.get_messages,
+      aws_api_gateway_integration.get_messages
     ]))
   }
 
@@ -215,7 +211,4 @@ resource "aws_api_gateway_stage" "main" {
   deployment_id = aws_api_gateway_deployment.api.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
   stage_name    = "main"
-  lifecycle {
-    replace_triggered_by  = [aws_api_gateway_deployment.api.id]
-  }
 }
