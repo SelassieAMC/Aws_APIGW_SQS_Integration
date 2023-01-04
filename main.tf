@@ -193,6 +193,7 @@ resource "aws_api_gateway_method_response" "sucessResponse" {
 
 resource "aws_api_gateway_deployment" "api" {
   rest_api_id = aws_api_gateway_rest_api.api.id
+  description = "Deployed at ${timestamp()}"
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_method.post_message,
@@ -203,7 +204,7 @@ resource "aws_api_gateway_deployment" "api" {
   }
 
   lifecycle {
-    create_before_destroy = false
+    create_before_destroy = true
   }
 
   depends_on = [
@@ -211,8 +212,8 @@ resource "aws_api_gateway_deployment" "api" {
   ]
 }
 
-resource "aws_api_gateway_stage" "main" {
+resource "aws_api_gateway_stage" "dev" {
   deployment_id = aws_api_gateway_deployment.api.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
-  stage_name    = "main"
+  stage_name    = "dev"
 }
