@@ -196,15 +196,15 @@ resource "aws_api_gateway_deployment" "api" {
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_method.post_message.id,
-      aws_api_gateway_integration.post_message.id,
-      aws_api_gateway_method.get_messages.id,
-      aws_api_gateway_integration.get_messages.id
+      aws_api_gateway_integration.post_message.id
     ]))
   }
 
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [aws_api_gateway_integration.post_message, aws_api_gateway_integration.get_messages]
 }
 
 resource "aws_api_gateway_stage" "main" {
