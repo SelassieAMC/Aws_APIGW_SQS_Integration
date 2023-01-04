@@ -115,9 +115,6 @@ resource "aws_api_gateway_method" "post_message" {
   api_key_required     = false
   http_method          = "POST"
   authorization        = "NONE"
-  lifecycle {
-    replace_triggered_by = [aws_api_gateway_stage.dev.id]
-  }
 }
 
 resource "aws_api_gateway_method" "get_messages" {
@@ -126,9 +123,6 @@ resource "aws_api_gateway_method" "get_messages" {
   api_key_required     = false
   http_method          = "GET"
   authorization        = "NONE"
-  lifecycle {
-    replace_triggered_by = [aws_api_gateway_stage.dev.id]
-  }
 }
 
 #query messages
@@ -172,11 +166,11 @@ resource "aws_api_gateway_integration" "post_message" {
 }
 
 #handler for success responses
-resource "aws_api_gateway_integration_response" "sucessResponse" {
+resource "aws_api_gateway_integration_response" "successResponse" {
   rest_api_id       = aws_api_gateway_rest_api.api.id
   resource_id       = aws_api_gateway_rest_api.api.root_resource_id
   http_method       = aws_api_gateway_method.post_message.http_method
-  status_code       = aws_api_gateway_method_response.sucessResponse.status_code
+  status_code       = aws_api_gateway_method_response.successResponse.status_code
   selection_pattern = "^2[0-9][0-9]" // regex pattern for any 200 message that comes back from SQS
 
   response_templates = {
@@ -186,7 +180,7 @@ resource "aws_api_gateway_integration_response" "sucessResponse" {
   depends_on = [aws_api_gateway_integration.post_message]
 }
 
-resource "aws_api_gateway_method_response" "sucessResponse" {
+resource "aws_api_gateway_method_response" "successResponse" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
   http_method = aws_api_gateway_method.post_message.http_method
@@ -199,7 +193,7 @@ resource "aws_api_gateway_method_response" "sucessResponse" {
 
 resource "aws_api_gateway_deployment" "api" {
   rest_api_id = aws_api_gateway_rest_api.api.id
-  description = "Deployed at ${timestamp()}"
+  stage_description  = "Deployed at ${timestamp()}"
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_method.post_message,
