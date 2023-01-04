@@ -206,13 +206,6 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   lifecycle {
     create_before_destroy = true
   }
-
-  # depends_on = [
-  #   aws_api_gateway_method.post_message,
-  #   aws_api_gateway_integration.post_message,
-  #   aws_api_gateway_method.get_messages,
-  #   aws_api_gateway_integration.get_messages
-  # ]
 }
 
 resource "aws_api_gateway_stage" "dev" {
