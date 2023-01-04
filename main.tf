@@ -171,7 +171,7 @@ resource "aws_api_gateway_integration" "post_message" {
   depends_on = [ aws_api_gateway_method.post_message ]
 }
 
-#handler for success responses
+#handler for post success responses
 resource "aws_api_gateway_integration_response" "successResponse" {
   rest_api_id       = aws_api_gateway_rest_api.api.id
   resource_id       = aws_api_gateway_rest_api.api.root_resource_id
@@ -187,6 +187,32 @@ resource "aws_api_gateway_integration_response" "successResponse" {
 }
 
 resource "aws_api_gateway_method_response" "successResponse" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_rest_api.api.root_resource_id
+  http_method = aws_api_gateway_method.post_message.http_method
+  status_code = 200
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+}
+
+#handler for get success responses
+resource "aws_api_gateway_integration_response" "getMessagesResponse" {
+  rest_api_id       = aws_api_gateway_rest_api.api.id
+  resource_id       = aws_api_gateway_rest_api.api.root_resource_id
+  http_method       = aws_api_gateway_method.get_messages.http_method
+  status_code       = aws_api_gateway_method_response.getMessageSuccessResponse.status_code
+  selection_pattern = "^2[0-9][0-9]" // regex pattern for any 200 message that comes back from SQS
+
+  response_templates = {
+    "application/json" = "{\"message\": \"Message queued!\"}"
+  }
+
+  depends_on = [aws_api_gateway_integration.get_messages]
+}
+
+resource "aws_api_gateway_method_response" "getMessageSuccessResponse" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
   http_method = aws_api_gateway_method.post_message.http_method
