@@ -115,7 +115,6 @@ resource "aws_api_gateway_method" "post_message" {
   api_key_required     = false
   http_method          = "POST"
   authorization        = "NONE"
-  depends_on = [aws_api_gateway_stage.dev]
 }
 
 resource "aws_api_gateway_method" "get_messages" {
@@ -124,7 +123,6 @@ resource "aws_api_gateway_method" "get_messages" {
   api_key_required     = false
   http_method          = "GET"
   authorization        = "NONE"
-  depends_on = [aws_api_gateway_stage.dev]
 }
 
 #query messages
@@ -210,7 +208,10 @@ resource "aws_api_gateway_deployment" "api" {
   }
 
   depends_on = [
-    aws_api_gateway_method.post_message, aws_api_gateway_method.get_messages
+    aws_api_gateway_method.post_message,
+    aws_api_gateway_integration.post_message,
+    aws_api_gateway_method.get_messages,
+    aws_api_gateway_integration.get_messages
   ]
 }
 
