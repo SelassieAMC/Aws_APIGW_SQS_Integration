@@ -109,7 +109,7 @@ resource "aws_api_gateway_rest_api" "api" {
   description = "Manage SQS messages"
 }
 
-resource "aws_api_gateway_method" "api" {
+resource "aws_api_gateway_method" "post_message" {
   rest_api_id          = aws_api_gateway_rest_api.api.id
   resource_id          = aws_api_gateway_rest_api.api.root_resource_id
   api_key_required     = false
@@ -117,8 +117,36 @@ resource "aws_api_gateway_method" "api" {
   authorization        = "NONE"
 }
 
+resource "aws_api_gateway_method" "get_messages" {
+  rest_api_id          = aws_api_gateway_rest_api.api.id
+  resource_id          = aws_api_gateway_rest_api.api.root_resource_id
+  api_key_required     = false
+  http_method          = "GET"
+  authorization        = "NONE"
+}
+
+#query messages
+resource "aws_api_gateway_integration" "get_messages" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_rest_api.api.root_resource_id
+  http_method             = "GET"
+  type                    = "AWS"
+  integration_http_method = "GET"
+  passthrough_behavior    = "NEVER"
+  credentials             = aws_iam_role.api.arn
+  uri                     = "arn:aws:apigateway:us-east-1:sqs:path/${aws_sqs_queue.queue.name}"
+
+  request_parameters = {
+    "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
+  }
+
+  request_templates = {
+    "application/json" = "Action=ReceiveMessage&MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All&Version=2012-11-05"
+  }
+}
+
 #forward records into SQS
-resource "aws_api_gateway_integration" "api" {
+resource "aws_api_gateway_integration" "post_message" {
   rest_api_id             = aws_api_gateway_rest_api.api.id
   resource_id             = aws_api_gateway_rest_api.api.root_resource_id
   http_method             = "POST"
@@ -141,7 +169,7 @@ resource "aws_api_gateway_integration" "api" {
 resource "aws_api_gateway_integration_response" "sucessResponse" {
   rest_api_id       = aws_api_gateway_rest_api.api.id
   resource_id       = aws_api_gateway_rest_api.api.root_resource_id
-  http_method       = aws_api_gateway_method.api.http_method
+  http_method       = aws_api_gateway_method.post_message.http_method
   status_code       = aws_api_gateway_method_response.sucessResponse.status_code
   selection_pattern = "^2[0-9][0-9]" // regex pattern for any 200 message that comes back from SQS
 
@@ -149,13 +177,13 @@ resource "aws_api_gateway_integration_response" "sucessResponse" {
     "application/json" = "{\"message\": \"Message queued!\"}"
   }
 
-  depends_on = [aws_api_gateway_integration.api]
+  depends_on = [aws_api_gateway_integration.post_message]
 }
 
 resource "aws_api_gateway_method_response" "sucessResponse" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
-  http_method = aws_api_gateway_method.api.http_method
+  http_method = aws_api_gateway_method.post_message.http_method
   status_code = 200
 
   response_models = {
@@ -167,8 +195,10 @@ resource "aws_api_gateway_deployment" "api" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   triggers = {
     redeployment = sha1(jsonencode([
-      aws_api_gateway_method.api.id,
-      aws_api_gateway_integration.api.id
+      aws_api_gateway_method.post_message.id,
+      aws_api_gateway_integration.post_message.id,
+      aws_api_gateway_method.get_messages.id,
+      aws_api_gateway_integration.get_messages.id
     ]))
   }
 
@@ -176,7 +206,7 @@ resource "aws_api_gateway_deployment" "api" {
     create_before_destroy = true
   }
 
-  depends_on = [aws_api_gateway_integration.api]
+  depends_on = [aws_api_gateway_integration.post_message, aws_api_gateway_integration.get_messages]
 }
 
 resource "aws_api_gateway_stage" "main" {
