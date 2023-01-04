@@ -191,7 +191,7 @@ resource "aws_api_gateway_method_response" "successResponse" {
   }
 }
 
-resource "aws_api_gateway_deployment" "api" {
+resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_description  = "Deployed at ${timestamp()}"
   triggers = {
@@ -216,7 +216,7 @@ resource "aws_api_gateway_deployment" "api" {
 }
 
 resource "aws_api_gateway_stage" "dev" {
-  deployment_id = aws_api_gateway_deployment.api.id
+  deployment_id = aws_api_gateway_deployment.api_deployment.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
   stage_name    = "dev"
 }
