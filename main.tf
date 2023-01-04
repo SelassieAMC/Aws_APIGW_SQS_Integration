@@ -137,6 +137,7 @@ resource "aws_api_gateway_integration" "get_messages" {
   passthrough_behavior    = "NEVER"
   credentials             = aws_iam_role.api.arn
   uri                     = "arn:aws:apigateway:us-east-1:sqs:path/${aws_sqs_queue.queue.name}/?Action=ReceiveMessage&MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All&Version=2012-11-05"
+  connection_type         = "application/json"
 
   depends_on = [ aws_api_gateway_method.get_messages ]
 }
