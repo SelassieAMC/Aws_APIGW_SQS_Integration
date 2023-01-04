@@ -115,6 +115,9 @@ resource "aws_api_gateway_method" "post_message" {
   api_key_required     = false
   http_method          = "POST"
   authorization        = "NONE"
+  lifecycle {
+    replace_triggered_by = [aws_api_gateway_stage.dev.id]
+  }
 }
 
 resource "aws_api_gateway_method" "get_messages" {
@@ -123,6 +126,9 @@ resource "aws_api_gateway_method" "get_messages" {
   api_key_required     = false
   http_method          = "GET"
   authorization        = "NONE"
+  lifecycle {
+    replace_triggered_by = [aws_api_gateway_stage.dev.id]
+  }
 }
 
 #query messages
