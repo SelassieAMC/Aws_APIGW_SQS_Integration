@@ -203,8 +203,12 @@ resource "aws_api_gateway_deployment" "api" {
   }
 
   lifecycle {
-    create_before_destroy = true
+    create_before_destroy = false
   }
+
+  depends_on = [
+    aws_api_gateway_method.post_message, aws_api_gateway_method.get_messages
+  ]
 }
 
 resource "aws_api_gateway_stage" "main" {
