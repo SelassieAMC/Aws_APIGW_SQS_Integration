@@ -138,11 +138,11 @@ resource "aws_api_gateway_integration" "api" {
 }
 
 #handler for success responses
-resource "aws_api_gateway_integration_response" "200" {
+resource "aws_api_gateway_integration_response" "sucessResponse" {
   rest_api_id       = aws_api_gateway_rest_api.api.id
   resource_id       = aws_api_gateway_rest_api.api.root_resource_id
   http_method       = aws_api_gateway_method.api.http_method
-  status_code       = aws_api_gateway_method_response.200.status_code
+  status_code       = aws_api_gateway_method_response.sucessResponse.status_code
   selection_pattern = "^2[0-9][0-9]" // regex pattern for any 200 message that comes back from SQS
 
   response_templates = {
@@ -152,7 +152,7 @@ resource "aws_api_gateway_integration_response" "200" {
   depends_on = ["aws_api_gateway_integration.api"]
 }
 
-resource "aws_api_gateway_method_response" "200" {
+resource "aws_api_gateway_method_response" "sucessResponse" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
   http_method = aws_api_gateway_method.api.http_method
