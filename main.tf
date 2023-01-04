@@ -115,6 +115,7 @@ resource "aws_api_gateway_method" "post_message" {
   api_key_required     = false
   http_method          = "POST"
   authorization        = "NONE"
+  depends_on = [ aws_api_gateway_rest_api.api ]
 }
 
 resource "aws_api_gateway_method" "get_messages" {
@@ -123,6 +124,7 @@ resource "aws_api_gateway_method" "get_messages" {
   api_key_required     = false
   http_method          = "GET"
   authorization        = "NONE"
+  depends_on = [ aws_api_gateway_rest_api.api ]
 }
 
 #query messages
@@ -143,6 +145,8 @@ resource "aws_api_gateway_integration" "get_messages" {
   request_templates = {
     "application/json" = "Action=ReceiveMessage&MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All&Version=2012-11-05"
   }
+
+  depends_on = [ aws_api_gateway_method.get_messages ]
 }
 
 #forward records into SQS
@@ -163,6 +167,8 @@ resource "aws_api_gateway_integration" "post_message" {
   request_templates = {
     "application/json" = "Action=SendMessage&MessageBody=$input.body"
   }
+
+  depends_on = [ aws_api_gateway_method.post_message ]
 }
 
 #handler for success responses
@@ -196,6 +202,7 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   stage_description  = "Deployed at ${timestamp()}"
   triggers = {
     redeployment = sha1(jsonencode([
+      aws_api_gateway_rest_api.api.id,
       aws_api_gateway_method.post_message.id,
       aws_api_gateway_integration.post_message.id,
       aws_api_gateway_method.get_messages.id,
