@@ -176,9 +176,7 @@ resource "aws_api_gateway_deployment" "api" {
     create_before_destroy = true
   }
 
-  depends_on = [
-    "aws_api_gateway_integration.api",
-  ]
+  depends_on = [aws_api_gateway_integration.api]
 }
 
 resource "aws_api_gateway_stage" "main" {
