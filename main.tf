@@ -136,10 +136,18 @@ resource "aws_api_gateway_integration" "get_messages" {
   integration_http_method = "GET"
   passthrough_behavior    = "NEVER"
   credentials             = aws_iam_role.api.arn
-  uri                     = "arn:aws:apigateway:us-east-1:sqs:path/${aws_sqs_queue.queue.name}/?Action=ReceiveMessage&MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All&Version=2012-11-05"
+  uri                     = "arn:aws:apigateway:us-east-1:sqs:path/${aws_sqs_queue.queue.name}"# /?Action=ReceiveMessage&MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All&Version=2012-11-05"
   
+  request_parameters = {
+    "integration.request.querystring.Action"="ReceiveMessage"
+    "integration.request.querystring.MaxNumberOfMessages"="5"
+    "integration.request.querystring.VisibilityTimeout"="15"
+    "integration.request.querystring.AttributeName"="All"
+    "integration.request.querystring.Version"="2012-11-05"
+  }
+
   request_templates = {
-    "application/json" = "Empty"
+    "application/json" = ""
   }
 
   depends_on = [ aws_api_gateway_method.get_messages ]
