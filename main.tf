@@ -139,11 +139,7 @@ resource "aws_api_gateway_integration" "get_messages" {
   uri                     = "arn:aws:apigateway:us-east-1:sqs:path/${aws_sqs_queue.queue.name}"
 
   request_parameters = {
-    "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
-  }
-
-  request_templates = {
-    "application/json" = "Action=ReceiveMessage&MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All&Version=2012-11-05"
+    "integration.request.querystring.url" = "Action=ReceiveMessage&MaxNumberOfMessages=5&VisibilityTimeout=15&AttributeName=All&Version=2012-11-05"
   }
 
   depends_on = [ aws_api_gateway_method.get_messages ]
