@@ -126,7 +126,7 @@ resource "aws_api_gateway_integration" "api" {
   integration_http_method = "POST"
   passthrough_behavior    = "NEVER"
   credentials             = aws_iam_role.api.arn
-  uri                     = "arn:aws:apigateway:${var.region}:sqs:path/${aws_sqs_queue.queue.name}"
+  uri                     = "arn:aws:apigateway:us-east-1:sqs:path/${aws_sqs_queue.queue.name}"
 
   request_parameters = {
     "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
@@ -149,7 +149,7 @@ resource "aws_api_gateway_integration_response" "sucessResponse" {
     "application/json" = "{\"message\": \"Message queued!\"}"
   }
 
-  depends_on = ["aws_api_gateway_integration.api"]
+  depends_on = [aws_api_gateway_integration.api]
 }
 
 resource "aws_api_gateway_method_response" "sucessResponse" {
