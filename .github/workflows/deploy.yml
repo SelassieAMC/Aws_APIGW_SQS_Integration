@@ -6,7 +6,7 @@ on:
 jobs:
   tf_fmt:
     name: Deploy Infraestructure
-    runs-on: np
+    runs-on: [np, self-hosted, windows, fxs, aws]
 
     steps:
     - name: Checkout Repo
