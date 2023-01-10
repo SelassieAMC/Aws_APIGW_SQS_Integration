@@ -8,7 +8,7 @@ on:
 jobs:
   tf_fmt:
     name: Deploy Infraestructure
-    runs-on: [self-hosted, linux, tms]
+    runs-on: [self-hosted]
 
     steps:
     - name: Checkout Repo
