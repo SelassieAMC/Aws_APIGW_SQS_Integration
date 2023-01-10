@@ -1,14 +1,12 @@
 name: Deploy 
 
 on:
-  push:
-    branches: [ "master" ]
   workflow_dispatch:
 
 jobs:
   tf_fmt:
     name: Deploy Infraestructure
-    runs-on: [self-hosted]
+    runs-on: np
 
     steps:
     - name: Checkout Repo
