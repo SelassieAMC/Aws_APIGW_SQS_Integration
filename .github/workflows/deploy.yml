@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  tf_fmt:
     name: Deploy Infraestructure
-    runs-on: [ Linux, cmxnp ]
+    runs-on: linux
 
     steps:
     - name: Checkout Repo
