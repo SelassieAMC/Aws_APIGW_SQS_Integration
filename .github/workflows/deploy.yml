@@ -7,7 +7,7 @@ on:
 jobs:
   tf_fmt:
     name: Deploy Infraestructure
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, np]
 
     steps:
     - name: Checkout Repo
